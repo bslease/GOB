@@ -12,23 +12,43 @@ public class Goal
         name = goalName;
         value = goalValue;
     }
+
+    public float GetDiscontentment(float newValue)
+    {
+        return newValue * newValue;
+    }
 }
 
 public class Action
 {
     public string name;
-    public string targetGoal;
-    public float utility;
+    //public string targetGoal;
+    //public float utility;
+    public List<Goal> targetGoals;
 
-    public Action (string actionName, string goalName, float utilityValue)
+    public Action (string actionName)
     {
         name = actionName;
-        targetGoal = goalName;
-        utility = utilityValue;
+        targetGoals = new List<Goal>();
     }
+
+    //public float GetGoalChange(Goal goal)
+    //{
+    //    return goal.name == targetGoal ? utility : 0f;
+    //}
 
     public float GetGoalChange(Goal goal)
     {
-        return (goal.name == targetGoal ? utility : 0f);
+        //return goal.name == targetGoal ? utility : 0f;
+
+        // find the goal in the list of goals
+        foreach (Goal target in targetGoals)
+        {
+            if (target.name == goal.name)
+            {
+                return target.value;
+            }
+        }
+        return 0f;
     }
 }
