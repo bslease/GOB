@@ -6,6 +6,8 @@ public class GoalSeeker : MonoBehaviour
 {
     Goal[] mGoals;
     Action[] mActions;
+    Action mChangeOverTime;
+    const float TICK_LENGTH = 5.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -55,7 +57,30 @@ public class GoalSeeker : MonoBehaviour
         mActions[5].targetGoals.Add(new Goal("Sleep", 0f));
         mActions[5].targetGoals.Add(new Goal("Bathroom", -4f));
 
-        Debug.Log("Ready. Hit E to do something.");
+        // the rate my goals change just as a result of time passing
+        mChangeOverTime = new Action("tick");
+        mChangeOverTime.targetGoals.Add(new Goal("Eat", +4f));
+        mChangeOverTime.targetGoals.Add(new Goal("Sleep", +1f));
+        mChangeOverTime.targetGoals.Add(new Goal("Bathroom", +2f));
+
+        Debug.Log("Starting clock. One hour will pass every " + TICK_LENGTH + " seconds.");
+        InvokeRepeating("Tick", 0f, TICK_LENGTH);
+
+        Debug.Log("Hit E to do something.");
+    }
+
+    void Tick()
+    {
+        // apply change over time
+        foreach (Goal goal in mGoals)
+        {
+            goal.value += mChangeOverTime.GetGoalChange(goal);
+            //Debug.Log(mChangeOverTime.GetGoalChange(goal));
+            goal.value = Mathf.Max(goal.value, 0);
+        }
+
+        // print results
+        PrintGoals();
     }
 
     void PrintGoals()
@@ -74,11 +99,11 @@ public class GoalSeeker : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            Debug.Log("-- INITIAL GOALS --");
-            PrintGoals();
+            //Debug.Log("-- INITIAL GOALS --");
+            //PrintGoals();
 
             Action bestThingToDo = ChooseAction(mActions, mGoals);
-            Debug.Log("-- BEST ACTION --");
+            //Debug.Log("-- BEST ACTION --");
             Debug.Log("I think I will " + bestThingToDo.name);
 
             // do the thing
@@ -88,7 +113,7 @@ public class GoalSeeker : MonoBehaviour
                 goal.value = Mathf.Max(goal.value, 0);
             }
 
-            Debug.Log("-- NEW GOALS --");
+            //Debug.Log("-- NEW GOALS --");
             PrintGoals();
         }
     }
@@ -144,7 +169,7 @@ public class GoalSeeker : MonoBehaviour
         foreach (Action action in actions)
         {
             float thisValue = Discontentment(action, goals);
-            Debug.Log("Maybe I should " + action.name + ". Resulting discontentment = " + thisValue);
+            //Debug.Log("Maybe I should " + action.name + ". Resulting discontentment = " + thisValue);
             if (thisValue < bestValue)
             {
                 bestValue = thisValue;
